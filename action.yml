@@ -1,0 +1,88 @@
+name: 'KyberCheck Scanner'
+description: 'Scan your codebase for quantum-vulnerable cryptography. Prepare for the post-quantum era.'
+author: 'KyberCheck'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  api-key:
+    description: 'Your KyberCheck API Key (get one at https://kybercheck.com)'
+    required: true
+  scan-id:
+    description: 'Scan ID from KyberCheck dashboard (auto-filled when triggered from dashboard)'
+    required: false
+  api-url:
+    description: 'API URL for results submission'
+    required: false
+    default: 'https://kybercheck.com'
+  path:
+    description: 'Path to scan (default: entire repository)'
+    required: false
+    default: '.'
+  fail-on-critical:
+    description: 'Fail the build if critical vulnerabilities are found'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Install KyberCheck CLI
+      shell: bash
+      run: |
+        echo "📦 Installing KyberCheck CLI..."
+        cargo install kybercheck --force
+        echo "✅ CLI installed: $(kybercheck --version)"
+      
+    - name: Run KyberCheck Scan
+      shell: bash
+      env:
+        KYBERCHECK_API_KEY: ${{ inputs.api-key }}
+      run: |
+        echo "========================================"
+        echo "🔍 KyberCheck Quantum Vulnerability Scan"
+        echo "========================================"
+        echo ""
+        echo "📋 Configuration:"
+        echo "  Path: ${{ inputs.path }}"
+        echo "  API URL: ${{ inputs.api-url }}"
+        echo "  Scan ID: ${{ inputs.scan-id }}"
+        echo "  API Key: ${KYBERCHECK_API_KEY:0:10}..."
+        echo ""
+        
+        CMD="kybercheck scan ${{ inputs.path }}"
+        
+        # Pass scan-id if provided (links to website-triggered scan)
+        if [ -n "${{ inputs.scan-id }}" ]; then
+          echo "🔗 Linking to dashboard scan: ${{ inputs.scan-id }}"
+          CMD="$CMD --scan-id ${{ inputs.scan-id }}"
+        else
+          echo "ℹ️  No scan-id provided, will create new scan"
+        fi
+        
+        # Pass API URL
+        if [ -n "${{ inputs.api-url }}" ]; then
+          CMD="$CMD --api-url ${{ inputs.api-url }}"
+        fi
+        
+        # Fail on vulnerabilities if requested
+        if [ "${{ inputs.fail-on-critical }}" = "true" ]; then
+          CMD="$CMD --fail-on-vuln"
+        fi
+        
+        echo ""
+        echo "🚀 Executing: $CMD"
+        echo "========================================"
+        echo ""
+        
+        $CMD
+        
+        echo ""
+        echo "========================================"
+        echo "✅ Scan complete!"
+        echo "========================================"
