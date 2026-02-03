@@ -51,8 +51,10 @@ Use the `exclude` input to skip certain files or directories. Patterns use glob 
 - uses: Ganamedee/kybercheck-action@v1
   with:
     api-key: ${{ secrets.KYBERCHECK_API_KEY }}
-    exclude: "**/test/**, **/*.test.js, examples/**"
+    # Use **/ to ensure matches regardless of relative paths (e.g. ./src)
+    exclude: "**/test/**, **/*.test.js, **/examples/**"
 ```
+
 
 ### Common Patterns
 
@@ -61,8 +63,8 @@ Use the `exclude` input to skip certain files or directories. Patterns use glob 
 | `**/test/**` | All `test` directories |
 | `**/*.test.js` | All JavaScript test files |
 | `**/*_test.go` | All Go test files |
-| `examples/**` | The `examples` directory |
-| `legacy/**` | The `legacy` directory |
+| `**/examples/**` | The `examples` directory |
+| `**/legacy/**` | The `legacy` directory |
 
 ## Filtering Languages
 
