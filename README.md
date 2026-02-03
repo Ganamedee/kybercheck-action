@@ -39,7 +39,41 @@ jobs:
 | `scan-id` | Scan ID (auto-filled from dashboard) | No | - |
 | `api-url` | API URL for results | No | `https://kybercheck.com` |
 | `path` | Path to scan | No | `.` |
+| `exclude` | Patterns to ignore (comma-separated globs) | No | - |
+| `languages` | Only scan these languages (comma-separated) | No | all |
 | `fail-on-critical` | Fail build on critical vulnerabilities | No | `false` |
+
+## Ignoring Files
+
+Use the `exclude` input to skip certain files or directories. Patterns use glob syntax:
+
+```yaml
+- uses: Ganamedee/kybercheck-action@v1
+  with:
+    api-key: ${{ secrets.KYBERCHECK_API_KEY }}
+    exclude: "**/test/**, **/*.test.js, examples/**"
+```
+
+### Common Patterns
+
+| Pattern | What it ignores |
+|---------|-----------------|
+| `**/test/**` | All `test` directories |
+| `**/*.test.js` | All JavaScript test files |
+| `**/*_test.go` | All Go test files |
+| `examples/**` | The `examples` directory |
+| `legacy/**` | The `legacy` directory |
+
+## Filtering Languages
+
+Only scan specific languages using the `languages` input:
+
+```yaml
+- uses: Ganamedee/kybercheck-action@v1
+  with:
+    api-key: ${{ secrets.KYBERCHECK_API_KEY }}
+    languages: "python,javascript,rust"
+```
 
 ## Getting an API Key
 
@@ -56,3 +90,4 @@ When you trigger scans from the KyberCheck dashboard, results automatically appe
 
 - [Documentation](https://kybercheck.com/docs)
 - [GitHub Actions Integration Guide](https://kybercheck.com/docs/github-actions)
+
