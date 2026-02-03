@@ -75,6 +75,20 @@ Only scan specific languages using the `languages` input:
     languages: "python,javascript,rust"
 ```
 
+## Blocking Failed Builds
+
+To prevent merging insecure code, you can fail the CI build if vulnerabilities are detected:
+
+```yaml
+- uses: Ganamedee/kybercheck-action@v1
+  with:
+    api-key: ${{ secrets.KYBERCHECK_API_KEY }}
+    fail-on-critical: true
+```
+> **Note:** This stops the build if *any* vulnerability is found (not just critical ones). To customize this, use a `.kybercheck.toml` config file.
+
+```
+
 ## Getting an API Key
 
 1. Sign up at [kybercheck.com](https://kybercheck.com)
